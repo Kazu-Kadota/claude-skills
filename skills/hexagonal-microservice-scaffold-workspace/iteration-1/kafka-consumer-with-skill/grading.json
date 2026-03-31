@@ -1,0 +1,12 @@
+{
+  "assertions": [
+    {"text": "paid-status-on-entity: 'paid' added to OrderStatus and markAsPaid() method added", "passed": true, "evidence": "OrderStatus const has 'paid' key; markAsPaid() transition method with guard against cancelling a paid order found in entity"},
+    {"text": "mark-paid-use-case-exists: MarkOrderAsPaidUseCase with telemetry.span()", "passed": true, "evidence": "use-cases/mark-order-as-paid.ts exists, wraps execute() in telemetry.span('orders.mark-as-paid', ...)"},
+    {"text": "consumer-adapter-correct-location: consumer in adapters/inbound/messaging/kafka/", "passed": true, "evidence": "adapters/inbound/messaging/kafka/order-consumer.ts — correctly in inbound, not outbound"},
+    {"text": "consumer-delegates-not-implements-logic: only parses and calls execute()", "passed": true, "evidence": "No direct DB/prisma/collection access; 2 execute() calls found; no business logic"},
+    {"text": "consumer-skip-on-error: try/catch per-message, logs not throws", "passed": true, "evidence": "try/catch inside eachMessage handler; errors logged with console.error"},
+    {"text": "consumer-bootstrap-is-separate: separate bootstrap.ts for consumer", "passed": true, "evidence": "adapters/inbound/messaging/kafka/bootstrap.ts is a standalone composition root"},
+    {"text": "main-ts-runs-both: main.ts calls both HTTP and consumer bootstraps", "passed": true, "evidence": "Promise.all([bootstrapExpress(), bootstrapKafkaConsumer()]) in main.ts"},
+    {"text": "http-adapter-untouched: Express controller and bootstrap not modified", "passed": true, "evidence": "No files written to adapters/inbound/http/express/ — HTTP adapter left intact"}
+  ]
+}

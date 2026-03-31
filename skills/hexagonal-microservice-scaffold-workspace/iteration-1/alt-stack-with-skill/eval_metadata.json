@@ -1,0 +1,16 @@
+{
+  "eval_id": 4,
+  "eval_name": "alt-stack-shipments",
+  "prompt": "I need a 'shipments' microservice for my logistics platform. The Shipment entity has: orderId (string), recipientName (string), address (string), trackingCode (string), status (pending|in_transit|delivered|failed). Use cases: create shipment, get shipment by id, mark as in_transit, mark as delivered, mark as failed. For infrastructure I'm using: DynamoDB as the only database (no Postgres, no MongoDB, no CQRS split), SQS for messaging (not Kafka), gRPC as the inbound protocol (not HTTP/Express/NestJS), and a simple in-memory Map as cache (no Redis). Use OpenTelemetry for tracing. Generate the full service with hexagonal architecture.",
+  "assertions": [
+    {"name": "domain-no-imports", "description": "domain/shipment.ts has no framework imports"},
+    {"name": "ports-are-abstract-classes", "description": "All ports use abstract class, not interface"},
+    {"name": "use-cases-wrap-telemetry-span", "description": "Every use case wraps execute() in telemetry.span()"},
+    {"name": "dynamodb-adapter-not-prisma", "description": "Database adapter uses DynamoDB, not Prisma or MongoDB"},
+    {"name": "sqs-adapter-not-kafka", "description": "Messaging adapter uses SQS, not Kafka"},
+    {"name": "grpc-inbound-not-express", "description": "Inbound adapter uses gRPC, not Express or NestJS"},
+    {"name": "in-memory-cache-not-redis", "description": "Cache adapter uses in-memory Map, not Redis"},
+    {"name": "status-as-const", "description": "Status enum defined as const object"},
+    {"name": "transition-methods-on-entity", "description": "Entity has transition methods (markInTransit, markDelivered, markFailed or equivalent)"}
+  ]
+}

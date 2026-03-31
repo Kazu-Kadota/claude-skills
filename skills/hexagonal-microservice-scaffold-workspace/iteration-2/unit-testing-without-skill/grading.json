@@ -1,0 +1,45 @@
+{
+  "assertions": [
+    {
+      "text": "domain-test-covers-validation-failure: Order domain test includes at least one test that expects create() to throw on invalid input",
+      "passed": true,
+      "evidence": "Domain tests include validation failure cases for empty customerId, empty items, quantity <= 0, negative unitPrice, missing productId"
+    },
+    {
+      "text": "domain-test-covers-cancel-guard: Order domain test includes a test that cancel() throws when the order is already cancelled",
+      "passed": true,
+      "evidence": "cancel() tests include 'throws on double-cancel' case in order.spec.ts"
+    },
+    {
+      "text": "doubles-extend-abstract-ports: Test doubles extend abstract port classes rather than using vi.fn() or plain objects",
+      "passed": false,
+      "evidence": "Use case tests (create-order.spec.ts, get-order.spec.ts, cancel-order.spec.ts) use vi.fn() stubs for all four outbound ports — no abstract class extension. The skill explicitly documents extending abstract classes to ensure TypeScript enforces the full port contract."
+    },
+    {
+      "text": "use-case-tests-assert-persistence: At least one use case test asserts that the write repository received the saved entity",
+      "passed": true,
+      "evidence": "CreateOrderUseCase tests verify writeRepository.save called with correct DTO; CancelOrderUseCase verifies updateOne not save"
+    },
+    {
+      "text": "use-case-tests-assert-event-published: At least one use case test asserts that the event bus published the correct topic",
+      "passed": true,
+      "evidence": "CreateOrderUseCase tests assert Kafka event published with correct topic and payload"
+    },
+    {
+      "text": "e2e-setup-uses-in-memory-adapters: _test/e2e/setup.ts wires real OrderController with in-memory test doubles — no real database or Kafka connection",
+      "passed": true,
+      "evidence": "E2E suite spins up real Express app wired to in-memory adapters (InMemoryOrderStore, InMemoryCache, no-op telemetry) via supertest — no external infrastructure"
+    },
+    {
+      "text": "e2e-tests-use-supertest: E2E test files use supertest to make HTTP requests against the Express app",
+      "passed": true,
+      "evidence": "orders.e2e.spec.ts uses supertest for all HTTP requests"
+    },
+    {
+      "text": "e2e-test-covers-error-case: E2E tests include at least one case that expects a 4xx response",
+      "passed": true,
+      "evidence": "POST /orders includes 400 on invalid bodies; GET includes 404; PUT cancel includes 404 not-found and 409 double-cancel"
+    }
+  ],
+  "qualitative_notes": "Without-skill run produced comprehensive tests but used vi.fn() stubs for all port dependencies instead of extending abstract port classes. This means TypeScript does not enforce that the mock satisfies the full port contract — if a port method is renamed or its signature changes, the test double silently diverges. The skill specifically teaches this distinction: extend abstract classes so the compiler catches drift between the double and the real port. Additionally, the without-skill run placed E2E at src/_test/e2e/ rather than _test/e2e/ at the service root."
+}

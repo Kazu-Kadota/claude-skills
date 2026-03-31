@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/articles"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ArticleStatus {
+  draft
+  published
+}
+
+enum TipStatus {
+  draft
+  published
+}
+
+enum TipCategory {
+  general
+  tutorial
+  howto
+  news
+}
+
+model Article {
+  id        String        @id @default(uuid())
+  title     String
+  content   String
+  status    ArticleStatus @default(draft)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime
+
+  @@index([id])
+  @@index([status])
+  @@map("articles")
+}
+
+model Tip {
+  id        String      @id @default(uuid())
+  content   String
+  category  TipCategory
+  status    TipStatus   @default(draft)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime
+
+  @@index([id])
+  @@index([status])
+  @@map("tips")
+}

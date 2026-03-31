@@ -1,0 +1,39 @@
+{
+  "assertions": [
+    {
+      "text": "domain-aggregate-subfolders: domain/article/article.ts and domain/tip/tip.ts (not flat in domain/)",
+      "passed": true,
+      "evidence": "domain/article/article.ts and domain/tip/tip.ts confirmed in the directory structure"
+    },
+    {
+      "text": "use-case-aggregate-subfolders: use-cases/article/ and use-cases/tip/",
+      "passed": true,
+      "evidence": "use-cases/article/{create-article.ts, get-article.ts, publish-article.ts} and use-cases/tip/{create-tip.ts, get-tip.ts}"
+    },
+    {
+      "text": "ports-per-aggregate: each aggregate has its own port files in application/ports/outbound/database/article/ and /tip/",
+      "passed": true,
+      "evidence": "application/ports/outbound/database/article/{database-read.ts, database-write.ts} and /tip/{database-read.ts, database-write.ts}; cache ports also per-aggregate"
+    },
+    {
+      "text": "messaging-only-for-article: Kafka/messaging port and adapter exist only for Article, not for Tip",
+      "passed": true,
+      "evidence": "application/ports/outbound/messaging/article/messaging.ts only; adapters/outbound/messaging/kafka/article-event-bus.ts only; no messaging port or adapter for Tip"
+    },
+    {
+      "text": "single-bootstrap-wires-both: single bootstrap.ts mounts both ArticleController and TipController on the same Express app",
+      "passed": true,
+      "evidence": "adapters/inbound/http/express/bootstrap.ts mounts app.use('/articles', ...) and app.use('/tips', ...); single composition root"
+    },
+    {
+      "text": "separate-controllers: separate controller files for Article and Tip",
+      "passed": true,
+      "evidence": "adapters/inbound/http/express/article/article-controller.ts and .../tip/tip-controller.ts"
+    },
+    {
+      "text": "shared-infrastructure-connections: one Postgres/MongoDB/Redis instance shared, not duplicated per aggregate",
+      "passed": true,
+      "evidence": "infrastructure/ has single postgres/connection.ts, mongodb/connection.ts, redis/connection.ts — wired once in bootstrap and passed to both aggregate's adapters"
+    }
+  ]
+}

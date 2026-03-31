@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "monorepo-from-scratch",
+  "prompt": "I'm starting a brand new repo from scratch. I need a monorepo with two microservices: 'notifications' and 'users'. Notifications entity: recipientId, channel [email|sms], message, status [pending|sent|failed]. Users entity: email, name, role [admin|member|guest], status [active|inactive]. Each service needs create, get, and delete use cases. Set up the full monorepo structure with root package.json workspaces, docker-compose.yml, and scaffold both services with hexagonal architecture. Postgres write + MongoDB read, Redis, Kafka, OpenTelemetry.",
+  "assertions": [
+    { "name": "root-workspace-config", "description": "Root package.json includes workspaces pointing to services/*" },
+    { "name": "both-services-scaffolded", "description": "Both notifications and users services are fully scaffolded" },
+    { "name": "structural-symmetry", "description": "Both services have identical folder structures" },
+    { "name": "docker-compose-includes-all-infra", "description": "docker-compose.yml includes postgres, mongodb, redis, kafka, and opentelemetry" },
+    { "name": "no-process-env-outside-config", "description": "process.env is only accessed inside infrastructure/config.ts" }
+  ]
+}

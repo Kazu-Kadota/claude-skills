@@ -1,0 +1,10 @@
+{
+  "assertions": [
+    {"text": "rating-validation: Review.create() validates rating is 1-5", "passed": true, "evidence": "Rating range check (< 1 or > 5) found in domain/review.ts"},
+    {"text": "approve-reject-transition-methods: Review entity has approve() and reject() methods", "passed": true, "evidence": "Both approve() and reject() methods found in domain/review.ts"},
+    {"text": "read-port-has-findByProductId: read port includes findByProductId with pagination", "passed": true, "evidence": "findByProductId method with pagination found in database-read.ts"},
+    {"text": "three-kafka-topics: review.submitted, review.approved, review.rejected all published", "passed": true, "evidence": "All three topic strings found in use case files"},
+    {"text": "cqrs-pattern: read use cases use read repo, write use cases use write repo", "passed": true, "evidence": "get-review.ts uses readRepository; submit-review.ts uses writeRepository"},
+    {"text": "no-framework-in-use-cases: use cases import nothing from express/nestjs/prisma/etc", "passed": true, "evidence": "No framework imports found in any use case file"}
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "assertions": [
+    {
+      "text": "domain-aggregate-subfolders: domain/article/article.ts and domain/tip/tip.ts (not flat in domain/)",
+      "passed": true,
+      "evidence": "domain/article/ and domain/tip/ subfolders confirmed"
+    },
+    {
+      "text": "use-case-aggregate-subfolders: use-cases/article/ and use-cases/tip/",
+      "passed": true,
+      "evidence": "Article and Tip use cases are organized separately under the application layer"
+    },
+    {
+      "text": "ports-per-aggregate: each aggregate has its own port files in application/ports/outbound/database/article/ and /tip/",
+      "passed": false,
+      "evidence": "Without-skill placed repository ports (ArticleRepositoryPort, ArticleReadRepositoryPort) inside domain/article/ as TypeScript interfaces, not in application/ports/outbound/. Ports belong in the application layer per hexagonal architecture; domain should have zero imports. Additionally, ports were defined as interfaces rather than abstract classes."
+    },
+    {
+      "text": "messaging-only-for-article: Kafka/messaging port and adapter exist only for Article, not for Tip",
+      "passed": true,
+      "evidence": "EventPublisherPort only injected into Article use cases; Tip use cases have no event publisher dependency"
+    },
+    {
+      "text": "single-bootstrap-wires-both: single bootstrap.ts mounts both ArticleController and TipController on the same Express app",
+      "passed": true,
+      "evidence": "container.ts serves as the single composition root wiring both aggregate controllers"
+    },
+    {
+      "text": "separate-controllers: separate controller files for Article and Tip",
+      "passed": true,
+      "evidence": "Separate Express controllers for Article and Tip aggregates"
+    },
+    {
+      "text": "shared-infrastructure-connections: one Postgres/MongoDB/Redis instance shared, not duplicated per aggregate",
+      "passed": true,
+      "evidence": "Graceful shutdown closes one set of connections (Kafka → Redis → Mongo → Postgres → OTel), confirming shared single instances"
+    }
+  ],
+  "qualitative_notes": "Without-skill demonstrated solid aggregate isolation (separate subfolders, messaging only for Article) but committed a layering violation: repository port interfaces were defined inside domain/article/ instead of application/ports/. Domain layer should have zero imports and define no contracts — ports belong in the application layer. Also used TypeScript interfaces instead of abstract classes for ports. The skill's layering rules table (Step 5) and port guidance (Step 3b) prevent this."
+}

@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "reviews-service",
+  "prompt": "I have an existing hexagonal monorepo. I need to add a 'reviews' microservice. The Review entity has: productId (string), userId (string), rating (1-5 number), comment (string, optional), status (pending|approved|rejected). Use cases: submit review, approve review, reject review, get review by id, list reviews by product (paginated). Express and NestJS bootstraps, CQRS with Postgres write/MongoDB read, Redis cache, Kafka events for review.submitted/review.approved/review.rejected, OpenTelemetry tracing. Generate all files.",
+  "assertions": [
+    { "name": "rating-validation", "description": "Review.create() validates rating is 1-5" },
+    { "name": "approve-reject-transition-methods", "description": "Review entity has approve() and reject() methods" },
+    { "name": "read-port-has-findByProductId", "description": "Read port includes findByProductId with pagination" },
+    { "name": "three-kafka-topics", "description": "Three Kafka topics: review.submitted, review.approved, review.rejected" },
+    { "name": "cqrs-pattern", "description": "Read use cases use read repo, write use cases use write repo" },
+    { "name": "no-framework-in-use-cases", "description": "Use case files import nothing from express, nestjs, prisma, mongodb, redis, or kafkajs" }
+  ]
+}

@@ -1,0 +1,21 @@
+// src/application/ports/outbound/database/database.ts
+// No CQRS split — single port for both reads and writes (DynamoDB as sole DB)
+import { ShipmentDTO, ShipmentStatusType } from "../../../../domain/shipment.js";
+
+export type FindByIdProjection = {
+  id: string;
+  orderId: string;
+  recipientName: string;
+  address: string;
+  trackingCode: string;
+  status: ShipmentStatusType;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+};
+
+export abstract class IShipmentRepositoryPort {
+  abstract findById(id: string): Promise<FindByIdProjection | null>;
+  abstract save(entity: ShipmentDTO): Promise<void>;
+  abstract updateOne(entity: ShipmentDTO): Promise<void>;
+  abstract delete(id: string): Promise<void>;
+}

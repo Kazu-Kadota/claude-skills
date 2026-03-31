@@ -1,0 +1,9 @@
+{
+  "assertions": [
+    {"text": "root-workspace-config: root package.json has workspaces array", "passed": true, "evidence": "workspaces found in root package.json"},
+    {"text": "both-services-scaffolded: notifications and users both fully scaffolded", "passed": false, "evidence": "Agent only completed notifications service (36 files). Users service not found — ran out of context generating the first service."},
+    {"text": "structural-symmetry: both services have identical folder structure", "passed": false, "evidence": "Only notifications was scaffolded; users is absent"},
+    {"text": "docker-compose-includes-all-infra: has postgres, mongo, redis, kafka, otel", "passed": true, "evidence": "All 5 infrastructure services present in docker-compose.yml"},
+    {"text": "no-process-env-outside-config: process.env only in config.ts", "passed": true, "evidence": "No process.env usage found outside infrastructure/config.ts"}
+  ]
+}

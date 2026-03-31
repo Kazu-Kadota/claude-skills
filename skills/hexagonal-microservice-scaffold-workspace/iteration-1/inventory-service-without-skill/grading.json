@@ -1,0 +1,13 @@
+{
+  "assertions": [
+    {"text": "domain-no-imports: domain/product.ts has no framework imports", "passed": true, "evidence": "No framework imports found in domain file"},
+    {"text": "ports-are-abstract-classes: all ports use abstract class", "passed": true, "evidence": "All port files export abstract classes"},
+    {"text": "use-cases-wrap-telemetry-span: all 4 use cases use telemetry.span()", "passed": true, "evidence": "4/4 use case files contain this.telemetry.span(...)"},
+    {"text": "redis-cache-ttl: Redis set() includes TTL (EX)", "passed": true, "evidence": "Found EX TTL parameter in Redis cache adapter"},
+    {"text": "status-as-const: ProductStatus defined as const object", "passed": true, "evidence": "as const pattern found in domain file"},
+    {"text": "graceful-shutdown-allsettled: Express bootstrap uses Promise.allSettled", "passed": true, "evidence": "allSettled found in bootstrap"},
+    {"text": "kafka-topic-naming: topics follow entity.past-tense-verb", "passed": true, "evidence": "product.created found in use cases"},
+    {"text": "config-zod-validated: config.ts uses Zod schema", "passed": true, "evidence": "z.object found in config"},
+    {"text": "correct-folder-structure: files in correct layers", "passed": true, "evidence": "domain:1 ports:6 uc:4 adapters:17 infra:10"}
+  ]
+}

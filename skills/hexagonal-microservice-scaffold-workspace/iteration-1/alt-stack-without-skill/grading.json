@@ -1,0 +1,13 @@
+{
+  "assertions": [
+    {"text": "domain-no-imports: domain/shipment.ts has no framework imports", "passed": true, "evidence": "No framework imports found in domain file"},
+    {"text": "ports-are-abstract-classes: all ports use abstract class", "passed": true, "evidence": "All 5 port files export abstract classes, including IGRPCPort"},
+    {"text": "use-cases-wrap-telemetry-span: all 5 use cases use telemetry.span()", "passed": true, "evidence": "5/5 use case files wrap execute() in telemetry.span(...)"},
+    {"text": "dynamodb-adapter-not-prisma: database adapter uses DynamoDB", "passed": true, "evidence": "DynamoDB adapter uses @aws-sdk/lib-dynamodb commands — no Prisma or Mongoose"},
+    {"text": "sqs-adapter-not-kafka: messaging adapter uses SQS", "passed": true, "evidence": "SQS adapter uses @aws-sdk/client-sqs SendMessageCommand"},
+    {"text": "grpc-inbound-not-express: inbound adapter uses gRPC", "passed": true, "evidence": "shipment-controller.ts uses @grpc/grpc-js with loadPackageDefinition and addService"},
+    {"text": "in-memory-cache-not-redis: cache adapter uses Map", "passed": true, "evidence": "InMemoryShipmentCache backed by injected Map<string, ShipmentDTO>"},
+    {"text": "status-as-const: ShipmentStatus defined as const object", "passed": true, "evidence": "as const pattern found in domain/shipment.ts"},
+    {"text": "transition-methods-on-entity: markInTransit/markDelivered/markFailed present", "passed": true, "evidence": "markAsInTransit, markAsDelivered, markAsFailed methods found in domain entity"}
+  ]
+}

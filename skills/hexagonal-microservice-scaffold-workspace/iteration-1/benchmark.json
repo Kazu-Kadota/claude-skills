@@ -1,0 +1,124 @@
+{
+  "skill_name": "hexagonal-microservice-scaffold",
+  "iteration": 1,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "inventory-service",
+          "pass_rate": 1.0,
+          "assertions_passed": 9,
+          "assertions_total": 9,
+          "duration_seconds": 310.6,
+          "total_tokens": 885
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "monorepo-from-scratch",
+          "pass_rate": 0.6,
+          "assertions_passed": 3,
+          "assertions_total": 5,
+          "duration_seconds": 304.4,
+          "total_tokens": 964
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "reviews-service",
+          "pass_rate": 1.0,
+          "assertions_passed": 6,
+          "assertions_total": 6,
+          "duration_seconds": 299.1,
+          "total_tokens": 779
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "alt-stack-shipments",
+          "pass_rate": 1.0,
+          "assertions_passed": 9,
+          "assertions_total": 9,
+          "duration_seconds": 308.8,
+          "total_tokens": 56865
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "kafka-consumer-inbound",
+          "pass_rate": 1.0,
+          "assertions_passed": 8,
+          "assertions_total": 8,
+          "duration_seconds": 124.9,
+          "total_tokens": 38432
+        }
+      ],
+      "mean_pass_rate": 0.92,
+      "mean_duration_seconds": 269.6,
+      "mean_tokens": 19585
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "inventory-service",
+          "pass_rate": 1.0,
+          "assertions_passed": 9,
+          "assertions_total": 9,
+          "duration_seconds": 314.2,
+          "total_tokens": 1007
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "monorepo-from-scratch",
+          "pass_rate": 0.4,
+          "assertions_passed": 2,
+          "assertions_total": 5,
+          "duration_seconds": 301.8,
+          "total_tokens": 1010
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "reviews-service",
+          "pass_rate": 0.5,
+          "assertions_passed": 3,
+          "assertions_total": 6,
+          "duration_seconds": 292.2,
+          "total_tokens": 1155
+        },
+        {
+          "eval_id": 4,
+          "eval_name": "alt-stack-shipments",
+          "pass_rate": 1.0,
+          "assertions_passed": 9,
+          "assertions_total": 9,
+          "duration_seconds": 318.6,
+          "total_tokens": 57378
+        },
+        {
+          "eval_id": 5,
+          "eval_name": "kafka-consumer-inbound",
+          "pass_rate": 1.0,
+          "assertions_passed": 8,
+          "assertions_total": 8,
+          "duration_seconds": 131.5,
+          "total_tokens": 25698
+        }
+      ],
+      "mean_pass_rate": 0.78,
+      "mean_duration_seconds": 271.7,
+      "mean_tokens": 17250
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.14,
+    "duration_seconds": -2.1,
+    "tokens": 2335
+  },
+  "analyst_observations": [
+    "Eval 5 (kafka-consumer-inbound) scores 8/8 for both variants — mechanically identical. However, the without-skill run introduced a qualitative design smell: it created an unnecessary IMessagingConsumerPort abstract class (a single 'start()' method) in application/ports/inbound/. The skill explicitly documents this as over-abstraction. This is the kind of subtle architectural noise that accumulates in codebases and is hard to catch in quantitative assertions.",
+    "Eval 3 (reviews-service) remains the most discriminating: 6/6 vs 3/6. DDD entity design details (validation, transition methods, CQRS separation) are where the skill provides the clearest guidance advantage.",
+    "Eval 2 (monorepo-from-scratch) reveals a persistent scope/context problem — both variants failed to scaffold the second service. The Step 2 fix (one service at a time) should help in practice but wasn't retested.",
+    "Evals 1, 4, and 5 score 100% for both variants. Single well-defined tasks with explicit requirements are handled well by Claude regardless of the skill. The skill's value concentrates on: (a) complex DDD domain modeling, (b) subtle architectural discipline like avoiding unnecessary abstractions.",
+    "The token delta flipped positive (+2335) due to the with-skill variant in eval 5 using more tokens — likely because it read the skill's reference files. For targeted additive tasks like eval 5, the skill adds reading overhead. Worth noting but not concerning given the quality benefit."
+  ]
+}

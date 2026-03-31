@@ -1,0 +1,15 @@
+{
+  "eval_id": 6,
+  "eval_name": "unit-testing",
+  "prompt": "I have an existing 'orders' service using hexagonal architecture (Express, Postgres write, MongoDB read, Redis cache, Kafka, OpenTelemetry). The Order entity has: id, customerId, items (array), status (pending|cancelled), and transition method cancel(). There are use cases: CreateOrderUseCase, GetOrderUseCase, CancelOrderUseCase. Please add unit tests for the Order domain entity and all three use cases, and an E2E test suite for the HTTP endpoints. Use Vitest.",
+  "assertions": [
+    { "name": "domain-test-covers-validation-failure", "description": "Order domain test includes at least one test that expects create() to throw on invalid input (e.g. missing customerId)" },
+    { "name": "domain-test-covers-cancel-guard", "description": "Order domain test includes a test that cancel() throws (or rejects) when the order is already cancelled" },
+    { "name": "doubles-extend-abstract-ports", "description": "Test doubles (FakeWriteRepo, FakeCache, etc.) extend the abstract port classes rather than using vi.fn() or plain objects" },
+    { "name": "use-case-tests-assert-persistence", "description": "At least one use case test asserts that the write repository received the saved entity (e.g. writeRepo.store has length 1)" },
+    { "name": "use-case-tests-assert-event-published", "description": "At least one use case test asserts that the event bus published the correct topic (e.g. 'order.created')" },
+    { "name": "e2e-setup-uses-in-memory-adapters", "description": "_test/e2e/setup.ts wires the real OrderController with in-memory test doubles — no real database or Kafka connection" },
+    { "name": "e2e-tests-use-supertest", "description": "E2E test files use supertest to make HTTP requests against the Express app" },
+    { "name": "e2e-test-covers-error-case", "description": "E2E tests include at least one case that expects a 4xx response (e.g. missing required field returns 400, or not found returns 404)" }
+  ]
+}

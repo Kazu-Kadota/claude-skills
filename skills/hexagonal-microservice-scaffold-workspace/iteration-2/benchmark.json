@@ -1,0 +1,52 @@
+{
+  "skill_name": "hexagonal-microservice-scaffold",
+  "iteration": 2,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_id": 6,
+          "eval_name": "unit-testing",
+          "pass_rate": 1.0,
+          "assertions_passed": 8,
+          "assertions_total": 8,
+          "duration_seconds": 334.6,
+          "total_tokens": 59487
+        }
+      ],
+      "mean_pass_rate": 1.0,
+      "mean_duration_seconds": 334.6,
+      "mean_tokens": 59487
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_id": 6,
+          "eval_name": "unit-testing",
+          "pass_rate": 0.875,
+          "assertions_passed": 7,
+          "assertions_total": 8,
+          "duration_seconds": 274.7,
+          "total_tokens": 36278
+        }
+      ],
+      "mean_pass_rate": 0.875,
+      "mean_duration_seconds": 274.7,
+      "mean_tokens": 36278
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.125,
+    "duration_seconds": 59.9,
+    "tokens": 23209
+  },
+  "analyst_observations": [
+    "Assertion 3 (doubles-extend-abstract-ports) is the sole discriminator: with-skill 8/8 vs without-skill 7/8. Without-skill used vi.fn() stubs throughout — functionally correct but loses TypeScript's contract enforcement on port interfaces. This is a subtle architectural discipline the skill explicitly documents and the baseline skips.",
+    "Assertions 1, 2, 4, 5, 6, 7, 8 all pass for both variants. Test coverage breadth (validation paths, guards, side-effect assertions, supertest E2E, in-memory adapters) is handled well by Claude without the skill — the skill's value here is the specific pattern of extending abstract classes for type-safe doubles.",
+    "Without-skill placed E2E at src/_test/e2e/ rather than _test/e2e/ at the service root — a minor structural deviation not captured by the assertions. Could add a directory-placement assertion in future iterations.",
+    "Token delta is +23k for the with-skill variant, primarily because it read 5 reference files before writing. The skill adds reading overhead but the qualitative output (proper abstract-class doubles, shared doubles.ts, hermetic buildTestApp per test) is more consistent.",
+    "The without-skill run was actually faster (274.7s vs 334.6s) and used fewer tokens — it went straight to writing without reading references. For teams that already know these patterns, the skill overhead might not be worth it for testing. For teams learning the architecture, the skill prevents the vi.fn() drift problem."
+  ]
+}

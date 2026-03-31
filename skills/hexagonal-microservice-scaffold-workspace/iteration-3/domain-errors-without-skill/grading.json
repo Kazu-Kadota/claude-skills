@@ -1,0 +1,40 @@
+{
+  "assertions": [
+    {
+      "text": "domain-error-base-class: DomainError extends Error and sets this.name",
+      "passed": true,
+      "evidence": "DomainError extends Error, sets this.name, restores prototype chain with Object.setPrototypeOf for ES5 compat, captures V8 stack trace. Also declared abstract."
+    },
+    {
+      "text": "three-standard-subtypes: NotFoundError, ConflictError, ValidationError all extend DomainError",
+      "passed": true,
+      "evidence": "All three subtypes present, each extending the abstract DomainError with a concrete code property"
+    },
+    {
+      "text": "entity-throws-typed-errors: order.ts throws DomainError subtypes, not plain new Error()",
+      "passed": true,
+      "evidence": "cancel() throws ConflictError; validateItems() throws ValidationError with per-field details"
+    },
+    {
+      "text": "http-error-handler-exists: 4-argument Express error middleware in adapters/inbound/http/express/",
+      "passed": true,
+      "evidence": "domainErrorHandler is a 4-arg Express middleware registered last in bootstrap"
+    },
+    {
+      "text": "http-maps-by-instanceof: ValidationError→400, NotFoundError→404, ConflictError→409",
+      "passed": false,
+      "evidence": "Without-skill maps NotFoundError→404 and ConflictError→409 correctly, but maps ValidationError→422 (not 400). This is semantically reasonable (RFC 7231 422 = Unprocessable Entity) but diverges from the documented convention. Any other DomainError falls through to 400."
+    },
+    {
+      "text": "domain-errors-warn-infra-errors-error: DomainError logged as console.warn, unknown as console.error",
+      "passed": true,
+      "evidence": "DomainError instances logged via req.app.locals.logger.warn(); unknown errors via logger.error() before 500"
+    },
+    {
+      "text": "infra-errors-return-500: Non-DomainError errors return HTTP 500",
+      "passed": true,
+      "evidence": "Final branch returns 500 with safe non-leaking message for unexpected errors"
+    }
+  ],
+  "qualitative_notes": "Without-skill produced a more elaborate DomainError (abstract class, required code property, Object.setPrototypeOf for ES5 prototype chain fix, ValidationError carries field-level details map). These are reasonable enhancements but add complexity beyond what the task required. The sole assertion failure is ValidationError→422 instead of 400 — a defensible RFC choice but inconsistent with the skill's documented convention. The skill provides a clear opinion (400) that prevents teams from diverging on this."
+}

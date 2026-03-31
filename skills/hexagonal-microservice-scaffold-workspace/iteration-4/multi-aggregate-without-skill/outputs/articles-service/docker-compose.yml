@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: articles-postgres
+    environment:
+      POSTGRES_DB: articles_db
+      POSTGRES_USER: articles_user
+      POSTGRES_PASSWORD: articles_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/infrastructure/database/postgres/migrations:/docker-entrypoint-initdb.d
+
+  mongodb:
+    image: mongo:7.0
+    container_name: articles-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: articles_read_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: articles-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: articles-kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: articles-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.51
+    container_name: articles-jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+      - "6831:6831/udp"
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:

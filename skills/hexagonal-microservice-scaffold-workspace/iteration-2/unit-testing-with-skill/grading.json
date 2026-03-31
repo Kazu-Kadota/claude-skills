@@ -1,0 +1,45 @@
+{
+  "assertions": [
+    {
+      "text": "domain-test-covers-validation-failure: Order domain test includes at least one test that expects create() to throw on invalid input",
+      "passed": true,
+      "evidence": "21 domain tests include explicit validation failure cases for empty customerId, empty items, quantity <= 0, negative unitPrice, missing productId"
+    },
+    {
+      "text": "domain-test-covers-cancel-guard: Order domain test includes a test that cancel() throws when the order is already cancelled",
+      "passed": true,
+      "evidence": "cancel-order tests include 'double-cancel domain guard' case that verifies cancel() throws on already-cancelled order"
+    },
+    {
+      "text": "doubles-extend-abstract-ports: Test doubles extend abstract port classes rather than using vi.fn() or plain objects",
+      "passed": true,
+      "evidence": "doubles.ts explicitly uses FakeWriteRepo, FakeReadRepo, FakeCache, FakeEventBus, PassthroughTelemetry — all extend abstract port classes, no vi.fn()"
+    },
+    {
+      "text": "use-case-tests-assert-persistence: At least one use case test asserts that the write repository received the saved entity",
+      "passed": true,
+      "evidence": "create-order tests verify writeRepo.store has correct entity; cancel-order tests verify updateOne was called not save"
+    },
+    {
+      "text": "use-case-tests-assert-event-published: At least one use case test asserts that the event bus published the correct topic",
+      "passed": true,
+      "evidence": "create-order tests assert eventBus published 'order.created'; cancel-order tests assert 'order.cancelled' published"
+    },
+    {
+      "text": "e2e-setup-uses-in-memory-adapters: _test/e2e/setup.ts wires real OrderController with in-memory test doubles — no real database or Kafka connection",
+      "passed": true,
+      "evidence": "_test/e2e/setup.ts has buildTestApp() using FakeWriteRepo, FakeReadRepo, FakeCache, FakeEventBus with in-memory stores; Express app wired without infrastructure connections"
+    },
+    {
+      "text": "e2e-tests-use-supertest: E2E test files use supertest to make HTTP requests against the Express app",
+      "passed": true,
+      "evidence": "E2E test files (create-order.e2e.test.ts, get-order.e2e.test.ts, cancel-order.e2e.test.ts) all use supertest request() against buildTestApp()"
+    },
+    {
+      "text": "e2e-test-covers-error-case: E2E tests include at least one case that expects a 4xx response",
+      "passed": true,
+      "evidence": "create-order E2E includes 400 for missing customerId; get-order includes 404; cancel-order includes 404 and 409 double-cancel"
+    }
+  ],
+  "qualitative_notes": "With-skill run precisely followed references/testing.md patterns: shared doubles.ts extending abstract classes, PassthroughTelemetry, E2E in _test/e2e/ at service root, buildTestApp() with hermetic in-memory stores, FakeReadRepo sharing write store by reference for CQRS transparency. Vitest config separates unit from e2e runs correctly."
+}

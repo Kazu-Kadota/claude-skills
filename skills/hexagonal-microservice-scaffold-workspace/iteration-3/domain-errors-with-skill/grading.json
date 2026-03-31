@@ -1,0 +1,39 @@
+{
+  "assertions": [
+    {
+      "text": "domain-error-base-class: DomainError extends Error and sets this.name",
+      "passed": true,
+      "evidence": "DomainError extends Error, sets this.name = this.constructor.name, captures V8 stack trace"
+    },
+    {
+      "text": "three-standard-subtypes: NotFoundError, ConflictError, ValidationError all extend DomainError",
+      "passed": true,
+      "evidence": "All three subtypes present in errors.ts, each extending DomainError with no additional boilerplate"
+    },
+    {
+      "text": "entity-throws-typed-errors: order.ts throws DomainError subtypes, not plain new Error()",
+      "passed": true,
+      "evidence": "create() throws ValidationError for missing customerId, empty items, invalid item fields; cancel() throws ConflictError when already cancelled"
+    },
+    {
+      "text": "http-error-handler-exists: 4-argument Express error middleware in adapters/inbound/http/express/",
+      "passed": true,
+      "evidence": "error-handler.ts exports a 4-arg function (err, req, res, next) registered in bootstrap.ts after all routes"
+    },
+    {
+      "text": "http-maps-by-instanceof: ValidationError→400, NotFoundError→404, ConflictError→409",
+      "passed": true,
+      "evidence": "instanceof checks in specificity order: ValidationError→400, NotFoundError→404, ConflictError→409, catch-all DomainError→422"
+    },
+    {
+      "text": "domain-errors-warn-infra-errors-error: DomainError logged as console.warn, unknown as console.error",
+      "passed": true,
+      "evidence": "DomainError branches use console.warn(err.message); unknown errors use console.error(err) before returning 500"
+    },
+    {
+      "text": "infra-errors-return-500: Non-DomainError errors return HTTP 500",
+      "passed": true,
+      "evidence": "Final else branch returns 500 with 'Internal server error' after console.error"
+    }
+  ]
+}

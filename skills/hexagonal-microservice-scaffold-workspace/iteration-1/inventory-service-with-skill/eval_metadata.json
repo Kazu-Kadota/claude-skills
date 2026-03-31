@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "inventory-service",
+  "prompt": "I want to create a new microservice for managing products in my e-commerce platform. The service should be called 'inventory', the entity is a 'Product' with fields: name (string), sku (string, unique), price (number), quantity (number), category (string), and status (active/inactive/discontinued). Operations needed: create product, get product by id, deactivate product (sets status to inactive), and delete product. Use the same hexagonal architecture as the orders service — Express + NestJS, Postgres for writes, MongoDB for reads, Redis cache, Kafka events, and OpenTelemetry tracing. Please scaffold the full service structure with all files.",
+  "assertions": [
+    { "name": "domain-no-imports", "description": "The domain/product.ts file has no framework or library imports" },
+    { "name": "ports-are-abstract-classes", "description": "All port definitions use 'abstract class' keyword, not 'interface'" },
+    { "name": "use-cases-wrap-telemetry-span", "description": "Every use case's execute() method wraps its body in this.telemetry.span(...)" },
+    { "name": "redis-cache-ttl", "description": "The Redis cache adapter's set() call includes a TTL (EX parameter)" },
+    { "name": "status-as-const", "description": "Product status enum is defined as 'as const' object, not TypeScript enum" },
+    { "name": "graceful-shutdown-allsettled", "description": "Express bootstrap uses Promise.allSettled for graceful shutdown" },
+    { "name": "kafka-topic-naming", "description": "Kafka topics follow the '<entity>.<past-tense-verb>' convention" },
+    { "name": "config-zod-validated", "description": "infrastructure/config.ts uses Zod schema" },
+    { "name": "correct-folder-structure", "description": "Files in correct hexagonal layers" }
+  ]
+}

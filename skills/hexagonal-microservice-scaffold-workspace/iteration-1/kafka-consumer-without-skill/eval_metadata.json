@@ -1,0 +1,15 @@
+{
+  "eval_id": 5,
+  "eval_name": "kafka-consumer-inbound",
+  "prompt": "I have an existing 'orders' service using hexagonal architecture (Express HTTP, Postgres write, MongoDB read, Redis cache, Kafka). I need to add a Kafka consumer that listens to events from the payments service. When a 'payment.completed' event arrives, it should mark the corresponding order as 'paid' — add a 'paid' status to the Order entity and a markAsPaid() transition method. When a 'payment.failed' event arrives, it should cancel the order (already exists as CancelOrderUseCase). Add the consumer adapter, its bootstrap, wire it into main.ts, and create the MarkOrderAsPaidUseCase. Do not touch the existing HTTP adapter.",
+  "assertions": [
+    {"name": "paid-status-on-entity", "description": "Order entity adds 'paid' status and markAsPaid() method"},
+    {"name": "mark-paid-use-case-exists", "description": "MarkOrderAsPaidUseCase exists with telemetry.span()"},
+    {"name": "consumer-adapter-correct-location", "description": "Kafka consumer in adapters/inbound/messaging/kafka/"},
+    {"name": "consumer-delegates-not-implements-logic", "description": "Consumer only parses and calls use case execute()"},
+    {"name": "consumer-skip-on-error", "description": "Consumer try/catches per-message, logs, does not throw"},
+    {"name": "consumer-bootstrap-is-separate", "description": "Separate bootstrap.ts for the Kafka consumer"},
+    {"name": "main-ts-runs-both", "description": "main.ts calls both HTTP and consumer bootstraps"},
+    {"name": "http-adapter-untouched", "description": "Existing Express controller and bootstrap are not modified"}
+  ]
+}

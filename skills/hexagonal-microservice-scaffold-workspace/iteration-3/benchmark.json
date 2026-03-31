@@ -1,0 +1,52 @@
+{
+  "skill_name": "hexagonal-microservice-scaffold",
+  "iteration": 3,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_id": 7,
+          "eval_name": "domain-errors",
+          "pass_rate": 1.0,
+          "assertions_passed": 7,
+          "assertions_total": 7,
+          "duration_seconds": 125.4,
+          "total_tokens": 39718
+        }
+      ],
+      "mean_pass_rate": 1.0,
+      "mean_duration_seconds": 125.4,
+      "mean_tokens": 39718
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_id": 7,
+          "eval_name": "domain-errors",
+          "pass_rate": 0.857,
+          "assertions_passed": 6,
+          "assertions_total": 7,
+          "duration_seconds": 84.9,
+          "total_tokens": 13282
+        }
+      ],
+      "mean_pass_rate": 0.857,
+      "mean_duration_seconds": 84.9,
+      "mean_tokens": 13282
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.143,
+    "duration_seconds": 40.5,
+    "tokens": 26436
+  },
+  "analyst_observations": [
+    "Assertion 5 (http-maps-by-instanceof) is the sole discriminator: with-skill 7/7, without-skill 6/7. Without-skill mapped ValidationError→422 instead of 400. This is an RFC 7231-defensible choice (422 Unprocessable Entity is semantically precise for validation failures) but diverges from the documented convention. The skill provides a clear, consistent opinion that prevents teams from independently choosing different codes.",
+    "Without-skill added substantial complexity beyond the task: abstract DomainError with required code property, Object.setPrototypeOf for ES5 prototype chain restoration, and ValidationError carrying a field-level details map. These are not wrong, but represent over-engineering relative to what was asked. The skill's reference keeps the base class minimal.",
+    "Both variants correctly used console.warn for DomainError and console.error for unknown errors (assertion 6). This was the expected discriminator but both variants got it right — the warn/error distinction may be common enough that the skill's explicit guidance isn't needed here.",
+    "Token gap is stark: without-skill used only 13k tokens vs 39k for with-skill. For this focused additive task (just errors + handler), without-skill was much leaner. The skill overhead came from reading 5+ reference files before writing. Future consideration: instruct the model to read only the directly relevant reference (errors.md) rather than the full skill context for narrow tasks.",
+    "Without-skill was also significantly faster (84.9s vs 125.4s) due to fewer file reads. For teams that understand the error pattern already, the skill may not add value here beyond the ValidationError→400 convention enforcement."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "orders-service",
+  "version": "0.1.0",
+  "description": "Orders microservice — hexagonal architecture with Express, Postgres write, MongoDB read, Redis cache, Kafka, and OpenTelemetry.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run src/domain src/application",
+    "test:e2e": "vitest run src/_test/e2e"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^1.6.0",
+    "supertest": "^7.0.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

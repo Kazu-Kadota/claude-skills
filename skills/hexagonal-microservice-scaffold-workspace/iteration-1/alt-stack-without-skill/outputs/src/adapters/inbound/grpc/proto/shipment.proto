@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package shipments;
+
+service ShipmentService {
+  rpc CreateShipment (CreateShipmentRequest) returns (ShipmentResponse);
+  rpc GetShipment (GetShipmentRequest) returns (ShipmentResponse);
+  rpc MarkAsInTransit (ShipmentIdRequest) returns (StatusResponse);
+  rpc MarkAsDelivered (ShipmentIdRequest) returns (StatusResponse);
+  rpc MarkAsFailed (ShipmentIdRequest) returns (StatusResponse);
+}
+
+message CreateShipmentRequest {
+  string order_id = 1;
+  string recipient_name = 2;
+  string address = 3;
+  string tracking_code = 4;
+}
+
+message GetShipmentRequest {
+  string id = 1;
+}
+
+message ShipmentIdRequest {
+  string id = 1;
+}
+
+message ShipmentResponse {
+  string id = 1;
+  string order_id = 2;
+  string recipient_name = 3;
+  string address = 4;
+  string tracking_code = 5;
+  string status = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message StatusResponse {
+  bool success = 1;
+}

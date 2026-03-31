@@ -1,0 +1,98 @@
+articles-service/
+├── docker-compose.yml
+├── .env.example
+├── package.json
+├── tsconfig.json
+├── jest.config.ts
+└── src/
+    ├── index.ts                          # Bootstrap: init tracing → wire container → start HTTP server
+    │
+    ├── domain/                           # Pure domain — zero external dependencies
+    │   ├── shared/
+    │   │   ├── cache.port.ts             # CachePort interface
+    │   │   ├── event-publisher.port.ts   # EventPublisherPort<TEvent> interface
+    │   │   └── index.ts
+    │   │
+    │   ├── article/                      # Article aggregate root
+    │   │   ├── article.entity.ts         # Article class: create(), publish(), reconstitute()
+    │   │   ├── article.read-model.ts     # Flat DTO for read side (MongoDB)
+    │   │   ├── article.repository.port.ts        # Write-side port (Postgres)
+    │   │   ├── article.read-repository.port.ts   # Read-side port (MongoDB)
+    │   │   ├── article.events.ts         # ArticleCreatedEvent | ArticlePublishedEvent
+    │   │   └── index.ts
+    │   │
+    │   └── tip/                          # Tip aggregate root
+    │       ├── tip.entity.ts             # Tip class: create(), reconstitute()
+    │       ├── tip.read-model.ts
+    │       ├── tip.repository.port.ts
+    │       ├── tip.read-repository.port.ts
+    │       └── index.ts
+    │
+    ├── application/                      # Use cases — orchestrate domain + ports
+    │   ├── article/
+    │   │   ├── use-cases/
+    │   │   │   ├── create-article.use-case.ts    # Save to PG + Mongo + publish article.created
+    │   │   │   ├── get-article.use-case.ts       # Read from Redis cache → Mongo fallback
+    │   │   │   └── publish-article.use-case.ts   # Mutate aggregate → save → invalidate cache → publish article.published
+    │   │   ├── __tests__/
+    │   │   │   ├── create-article.use-case.spec.ts
+    │   │   │   └── publish-article.use-case.spec.ts
+    │   │   └── index.ts
+    │   │
+    │   └── tip/
+    │       ├── use-cases/
+    │       │   ├── create-tip.use-case.ts        # Save to PG + Mongo (no events)
+    │       │   └── get-tip.use-case.ts           # Redis cache → Mongo fallback
+    │       ├── __tests__/
+    │       │   └── create-tip.use-case.spec.ts
+    │       └── index.ts
+    │
+    └── infrastructure/                   # Adapters — implement ports + framework code
+        ├── config/
+        │   └── env.ts                    # loadConfig() from process.env
+        │
+        ├── container.ts                  # Dependency injection / composition root
+        │
+        ├── telemetry/
+        │   └── tracer.ts                 # OpenTelemetry SDK init (Jaeger exporter)
+        │
+        ├── database/
+        │   ├── postgres/
+        │   │   ├── postgres.client.ts    # Singleton pg.Pool wrapper
+        │   │   ├── migrations/
+        │   │   │   ├── 001_create_articles_table.sql
+        │   │   │   └── 002_create_tips_table.sql
+        │   │   └── repositories/
+        │   │       ├── article.postgres.repository.ts   # Implements ArticleRepositoryPort (write)
+        │   │       └── tip.postgres.repository.ts       # Implements TipRepositoryPort (write)
+        │   │
+        │   └── mongodb/
+        │       ├── mongodb.client.ts     # Singleton mongoose wrapper
+        │       ├── schemas/
+        │       │   ├── article.mongo.schema.ts
+        │       │   └── tip.mongo.schema.ts
+        │       └── repositories/
+        │           ├── article.mongo.repository.ts      # Implements ArticleReadRepositoryPort (read)
+        │           └── tip.mongo.repository.ts          # Implements TipReadRepositoryPort (read)
+        │
+        ├── cache/
+        │   ├── redis.client.ts           # Singleton ioredis wrapper
+        │   └── redis-cache.adapter.ts    # Implements CachePort
+        │
+        ├── messaging/
+        │   └── kafka/
+        │       ├── kafka.client.ts       # Singleton KafkaJS producer wrapper
+        │       └── kafka-event-publisher.adapter.ts  # Implements EventPublisherPort (Article only)
+        │
+        └── http/
+            └── express/
+                ├── app.ts                # Express Application factory
+                ├── middleware/
+                │   ├── error-handler.middleware.ts
+                │   └── request-logger.middleware.ts
+                ├── controllers/
+                │   ├── article.controller.ts   # create / getById / publish — with OTel spans
+                │   └── tip.controller.ts       # create / getById — with OTel spans
+                └── routes/
+                    ├── article.routes.ts       # POST /api/v1/articles, GET /:id, PATCH /:id/publish
+                    └── tip.routes.ts           # POST /api/v1/tips, GET /:id

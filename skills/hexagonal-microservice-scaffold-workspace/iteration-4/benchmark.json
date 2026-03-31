@@ -1,0 +1,52 @@
+{
+  "skill_name": "hexagonal-microservice-scaffold",
+  "iteration": 4,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_id": 8,
+          "eval_name": "multi-aggregate",
+          "pass_rate": 1.0,
+          "assertions_passed": 7,
+          "assertions_total": 7,
+          "duration_seconds": 341.4,
+          "total_tokens": 67599
+        }
+      ],
+      "mean_pass_rate": 1.0,
+      "mean_duration_seconds": 341.4,
+      "mean_tokens": 67599
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_id": 8,
+          "eval_name": "multi-aggregate",
+          "pass_rate": 0.857,
+          "assertions_passed": 6,
+          "assertions_total": 7,
+          "duration_seconds": 367.1,
+          "total_tokens": 39246
+        }
+      ],
+      "mean_pass_rate": 0.857,
+      "mean_duration_seconds": 367.1,
+      "total_tokens": 39246
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.143,
+    "duration_seconds": -25.7,
+    "tokens": 28353
+  },
+  "analyst_observations": [
+    "Assertion 3 (ports-per-aggregate) is the sole discriminator: 7/7 vs 6/7. Without-skill placed repository port interfaces inside domain/article/ — a classic layering violation where developers conflate 'the domain owns the contract' with 'the contract lives in the domain folder'. The skill's layering rules table (domain imports nothing) and Step 3b (ports are abstract classes in application/ports/) prevent this.",
+    "Without-skill also used TypeScript interfaces for ports instead of abstract classes. This is not directly captured by assertion 3 but is a secondary design smell — interfaces cannot be extended with shared default behaviour, and TypeScript's structural typing means a plain object can accidentally satisfy an interface without being a real implementation.",
+    "Assertions 1, 2, 4, 5, 6, 7 passed for both variants. Aggregate subfoldering, messaging isolation, single bootstrap, and shared infra are all handled correctly without the skill — these are intuitive patterns that Claude applies by default for multi-aggregate requests.",
+    "Without-skill was slower (367.1s vs 341.4s) despite using fewer tokens (39k vs 68k), likely because it had more tool calls (58) producing more fine-grained file writes. The skill's reference files front-load reading cost but reduce decision overhead during writing.",
+    "The port-in-domain layering violation is subtle and common in the wild — it looks reasonable ('Article owns its repository contract') but breaks the dependency rule. This is precisely the kind of nuanced error the skill is most valuable for preventing."
+  ]
+}

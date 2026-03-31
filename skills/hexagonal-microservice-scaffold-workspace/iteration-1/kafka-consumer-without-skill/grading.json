@@ -1,0 +1,13 @@
+{
+  "assertions": [
+    {"text": "paid-status-on-entity: 'paid' added to OrderStatus and markAsPaid() method added", "passed": true, "evidence": "'paid' key in OrderStatus const; markAsPaid() method mirrors cancel() pattern"},
+    {"text": "mark-paid-use-case-exists: MarkOrderAsPaidUseCase with telemetry.span()", "passed": true, "evidence": "use-cases/mark-order-as-paid.ts exists, wraps execute() in telemetry.span(...)"},
+    {"text": "consumer-adapter-correct-location: consumer in adapters/inbound/messaging/kafka/", "passed": true, "evidence": "adapters/inbound/messaging/kafka/payment-events-consumer.ts — correct layer"},
+    {"text": "consumer-delegates-not-implements-logic: only parses and calls execute()", "passed": true, "evidence": "No direct DB access; 2 execute() calls; dispatches via switch on event type"},
+    {"text": "consumer-skip-on-error: try/catch per-message, logs not throws", "passed": true, "evidence": "2 try/catch blocks in eachMessage handler (one for parse, one for dispatch)"},
+    {"text": "consumer-bootstrap-is-separate: separate bootstrap.ts for consumer", "passed": true, "evidence": "adapters/inbound/messaging/kafka/bootstrap.ts is a standalone composition root"},
+    {"text": "main-ts-runs-both: main.ts calls both HTTP and consumer bootstraps", "passed": true, "evidence": "bootstrapExpress() and bootstrapKafkaPaymentConsumer() both called in main.ts"},
+    {"text": "http-adapter-untouched: Express controller and bootstrap not modified", "passed": true, "evidence": "No files written to adapters/inbound/http/express/"}
+  ],
+  "qualitative_notes": "Without-skill created an unnecessary IMessagingConsumerPort abstract class in application/ports/inbound/messaging.ts (a single-method 'start()' interface). The skill explicitly documents this as over-abstraction — no port is needed between the consumer and the use case. This is a design smell that adds complexity without benefit, but does not fail any of the quantitative assertions."
+}
