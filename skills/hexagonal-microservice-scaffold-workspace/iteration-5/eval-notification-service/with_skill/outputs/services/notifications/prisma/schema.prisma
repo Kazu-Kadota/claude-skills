@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/notifications"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum values MUST match domain NotificationStatus keys exactly
+enum NotificationStatus {
+  pending
+  sent
+  failed
+}
+
+// Enum values MUST match domain NotificationType keys exactly
+enum NotificationType {
+  push
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String
+  deviceToken String
+  title       String
+  body        String
+  type        NotificationType
+  status      NotificationStatus @default(pending)
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime
+
+  @@index([id])
+  @@index([userId])
+  @@index([status])
+  @@map("notifications")
+}

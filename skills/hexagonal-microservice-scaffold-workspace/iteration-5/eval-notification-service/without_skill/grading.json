@@ -1,0 +1,113 @@
+{
+  "eval_id": 9,
+  "eval_name": "notification-service-tdd-full-scaffold",
+  "run": "without_skill",
+  "expectations": [
+    {
+      "text": "domain-no-imports: notification.ts has zero imports from external frameworks or libraries",
+      "passed": true,
+      "evidence": "notification.entity.ts imports only from 'crypto' (Node.js built-in), not from express, prisma, nestjs, etc."
+    },
+    {
+      "text": "ports-are-abstract-classes: all port definitions use 'abstract class' keyword, not 'interface'",
+      "passed": false,
+      "evidence": "notification.repository.ts uses 'interface NotificationRepository' — not an abstract class. push-notification.port.ts correctly uses 'abstract class PushNotificationPort', but the main repository port is an interface."
+    },
+    {
+      "text": "status-as-const: Notification status is defined as an 'as const' object, not a TypeScript enum",
+      "passed": false,
+      "evidence": "notification.entity.ts uses union type: 'type NotificationStatus = \"pending\" | \"sent\" | \"failed\"' — not an 'as const' object pattern."
+    },
+    {
+      "text": "private-constructor: Notification class uses a private constructor",
+      "passed": true,
+      "evidence": "Line 40: 'private constructor(props: NotificationProps)' — confirmed."
+    },
+    {
+      "text": "terminal-state-guard: markAsSent() and markAsFailed() throw when already in terminal state",
+      "passed": true,
+      "evidence": "markAsSent checks 'if (this._status !== \"pending\")' and throws. markAsFailed does the same. Effectively guards against re-transitioning from terminal states."
+    },
+    {
+      "text": "use-cases-wrap-telemetry-span: every use case's execute() body is wrapped in this.telemetry.span(...)",
+      "passed": false,
+      "evidence": "create-notification use case has no telemetry dependency injected and no span wrapping. No telemetry port or dependency in any use case."
+    },
+    {
+      "text": "fcm-push-port-exists: INotificationPushPort abstract class exists as an outbound port",
+      "passed": true,
+      "evidence": "src/domain/push-notification.port.ts exports 'abstract class PushNotificationPort' — abstract class exists (named differently but fulfils the intent)."
+    },
+    {
+      "text": "fcm-adapter-implements-port: FcmPushAdapter extends/implements the push port abstract class",
+      "passed": true,
+      "evidence": "fcm-push.adapter.ts: 'export class FcmPushAdapter extends PushNotificationPort' — correctly extends the abstract port."
+    },
+    {
+      "text": "kafka-consumer-inbound: a Kafka consumer adapter exists under adapters/inbound/messaging/kafka/",
+      "passed": false,
+      "evidence": "Consumer is at src/infrastructure/messaging/kafka/kafka.consumer.ts — placed in infrastructure layer, not in adapters/inbound/ as hexagonal architecture requires."
+    },
+    {
+      "text": "kafka-consumer-separate-bootstrap: the consumer has its own bootstrap.ts separate from the Express HTTP bootstrap",
+      "passed": false,
+      "evidence": "No separate bootstrap.ts for the consumer. The consumer is started directly in main.ts alongside the HTTP server."
+    },
+    {
+      "text": "kafka-topic-naming: Kafka topics follow notification.<past-tense-verb> convention",
+      "passed": false,
+      "evidence": "Use cases have no event bus dependency — no events published. The consumer listens to 'order.created' but no outbound notification.* topics are published."
+    },
+    {
+      "text": "consumer-no-business-logic: the Kafka consumer adapter only parses messages and delegates to use cases",
+      "passed": true,
+      "evidence": "handleOrderCreated() only validates fields and delegates to createNotificationUseCase.execute(). Minimal business logic (null check for required fields)."
+    },
+    {
+      "text": "redis-cache-ttl: the Redis cache adapter's set() call includes a TTL",
+      "passed": true,
+      "evidence": "N/A — Redis was not requested in this service's spec. No Redis adapter generated, which is correct."
+    },
+    {
+      "text": "config-zod-validated: infrastructure/config.ts uses a Zod schema to parse and validate environment variables",
+      "passed": false,
+      "evidence": "No config.ts with Zod. process.env accessed directly in main.ts (PORT, KAFKA_BROKERS, etc.), container.ts, and prisma.client.ts."
+    },
+    {
+      "text": "js-extensions-on-imports: all local imports use the .js extension",
+      "passed": false,
+      "evidence": "Zero files use .js extensions on local imports. All imports use bare module paths (e.g. '../../../domain/notification.entity')."
+    },
+    {
+      "text": "test-doubles-extend-abstract-ports: doubles.ts uses 'extends' on the abstract port classes",
+      "passed": false,
+      "evidence": "InMemoryNotificationRepository uses 'implements NotificationRepository' (which is an interface, not abstract class). StubPushAdapter correctly uses 'extends PushNotificationPort'. Mixed — partial credit, but repository double fails the pattern."
+    },
+    {
+      "text": "e2e-uses-in-memory-adapters: _test/e2e/setup.ts wires the real controller with in-memory test doubles",
+      "passed": true,
+      "evidence": "E2E test file uses in-memory repository and stub push adapter. No real DB or Kafka connections in tests."
+    },
+    {
+      "text": "tdd-test-files-exist: test files exist for every layer",
+      "passed": true,
+      "evidence": "domain test (notification.entity.test.ts), use case tests (__tests__/), and e2e test (__tests__/notifications.e2e.test.ts) all present."
+    },
+    {
+      "text": "no-process-env-outside-config: process.env is only accessed inside infrastructure/config.ts",
+      "passed": false,
+      "evidence": "process.env accessed in main.ts (PORT, KAFKA_BROKERS, KAFKA_GROUP_ID, KAFKA_CLIENT_ID), container.ts, and prisma.client.ts."
+    },
+    {
+      "text": "graceful-shutdown-allsettled: Express bootstrap uses Promise.allSettled to close multiple connections on shutdown",
+      "passed": false,
+      "evidence": "main.ts shutdown runs kafkaConsumer.stop() and disconnectPrisma() sequentially with .catch(), not with Promise.allSettled."
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 9,
+    "failed": 11,
+    "pass_rate": 0.45
+  }
+}

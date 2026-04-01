@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "skill_name": "hexagonal-microservice-scaffold",
+    "skill_path": "/workspace/.claude/skills/hexagonal-microservice-scaffold",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-04-01T02:38:27Z",
+    "evals_run": [9],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 9,
+      "eval_name": "notification-service-tdd-full-scaffold",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 20,
+        "failed": 0,
+        "total": 20,
+        "time_seconds": 1145.4,
+        "tokens": 89123,
+        "tool_calls": 69,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "domain-no-imports: notification.ts has zero imports from external frameworks or libraries", "passed": true, "evidence": "notification.ts has no import statements at all; uses crypto.randomUUID() as a global (NodeNext built-in)."},
+        {"text": "ports-are-abstract-classes: all port definitions use 'abstract class' keyword, not 'interface'", "passed": true, "evidence": "All ports confirmed as abstract class: INotificationsRepositoryWritePort, INotificationPushPort, etc."},
+        {"text": "status-as-const: Notification status is defined as an 'as const' object, not a TypeScript enum", "passed": true, "evidence": "NotificationStatus = { pending: 'pending', sent: 'sent', failed: 'failed' } as const"},
+        {"text": "private-constructor: Notification class uses a private constructor", "passed": true, "evidence": "Line 48: 'private constructor(...)' confirmed."},
+        {"text": "terminal-state-guard: markAsSent() and markAsFailed() throw when already in terminal state", "passed": true, "evidence": "assertNotTerminal() checks TERMINAL_STATES array and throws. Both methods call it first."},
+        {"text": "use-cases-wrap-telemetry-span: every use case's execute() body is wrapped in this.telemetry.span(...)", "passed": true, "evidence": "create-notification.ts: return this.telemetry.span('notifications.create', async () => {...})"},
+        {"text": "fcm-push-port-exists: INotificationPushPort abstract class exists as an outbound port", "passed": true, "evidence": "src/application/ports/outbound/push/push.ts exports 'abstract class INotificationPushPort'"},
+        {"text": "fcm-adapter-implements-port: FcmPushAdapter extends/implements the push port abstract class", "passed": true, "evidence": "fcm-push-adapter.ts: 'export class FcmPushAdapter implements INotificationPushPort'"},
+        {"text": "kafka-consumer-inbound: a Kafka consumer adapter exists under adapters/inbound/messaging/kafka/", "passed": true, "evidence": "src/adapters/inbound/messaging/kafka/notification-consumer.ts confirmed."},
+        {"text": "kafka-consumer-separate-bootstrap: the consumer has its own bootstrap.ts separate from the Express HTTP bootstrap", "passed": true, "evidence": "src/adapters/inbound/messaging/kafka/bootstrap.ts exists separately."},
+        {"text": "kafka-topic-naming: Kafka topics follow notification.<past-tense-verb> convention", "passed": true, "evidence": "Topics: 'notification.created', 'notification.sent', 'notification.failed' all confirmed."},
+        {"text": "consumer-no-business-logic: the Kafka consumer adapter only parses messages and delegates to use cases", "passed": true, "evidence": "Consumer only parses JSON, switches on topic, calls use case.execute()."},
+        {"text": "redis-cache-ttl: N/A - Redis not in this service spec", "passed": true, "evidence": "Redis was not requested. No Redis adapter generated, which is correct."},
+        {"text": "config-zod-validated: infrastructure/config.ts uses a Zod schema to parse and validate environment variables", "passed": true, "evidence": "config.ts uses z.object() schema and schema.parse(). All process.env access isolated here."},
+        {"text": "js-extensions-on-imports: all local imports use the .js extension", "passed": true, "evidence": "grep found 33 files with .js imports and 0 local relative imports without .js extension."},
+        {"text": "test-doubles-extend-abstract-ports: doubles.ts uses 'extends' on the abstract port classes", "passed": true, "evidence": "FakeWriteRepo extends INotificationsRepositoryWritePort, FakePushAdapter extends INotificationPushPort, etc."},
+        {"text": "e2e-uses-in-memory-adapters: _test/e2e/setup.ts wires the real controller with in-memory test doubles", "passed": true, "evidence": "setup.ts wires NotificationController with FakeWriteRepo, FakeReadRepo, FakeEventBus, FakePushAdapter."},
+        {"text": "tdd-test-files-exist: test files exist for every layer", "passed": true, "evidence": "domain/_test/, use-cases/_test/, _test/e2e/ all present with multiple test files."},
+        {"text": "no-process-env-outside-config: process.env is only accessed inside infrastructure/config.ts", "passed": true, "evidence": "grep found process.env only in src/infrastructure/config.ts."},
+        {"text": "graceful-shutdown-allsettled: Express bootstrap uses Promise.allSettled to close multiple connections on shutdown", "passed": true, "evidence": "bootstrap.ts: Promise.allSettled([postgresWriteConnection.close(), postgresReadConnection.close(), kafkaConnection.close()])"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 9,
+      "eval_name": "notification-service-tdd-full-scaffold",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.45,
+        "passed": 9,
+        "failed": 11,
+        "total": 20,
+        "time_seconds": 425.7,
+        "tokens": 44683,
+        "tool_calls": 62,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "domain-no-imports: notification.ts has zero imports from external frameworks or libraries", "passed": true, "evidence": "Imports only 'crypto' (Node.js built-in), not express/prisma/nestjs."},
+        {"text": "ports-are-abstract-classes: all port definitions use 'abstract class' keyword, not 'interface'", "passed": false, "evidence": "notification.repository.ts uses 'interface NotificationRepository'. Push port correctly uses abstract class, but repository does not."},
+        {"text": "status-as-const: Notification status is defined as an 'as const' object, not a TypeScript enum", "passed": false, "evidence": "Uses union type: 'type NotificationStatus = \"pending\" | \"sent\" | \"failed\"' — not an 'as const' object."},
+        {"text": "private-constructor: Notification class uses a private constructor", "passed": true, "evidence": "'private constructor(props: NotificationProps)' confirmed."},
+        {"text": "terminal-state-guard: markAsSent() and markAsFailed() throw when already in terminal state", "passed": true, "evidence": "Both methods check 'if (this._status !== \"pending\")' and throw — effectively guards terminal states."},
+        {"text": "use-cases-wrap-telemetry-span: every use case's execute() body is wrapped in this.telemetry.span(...)", "passed": false, "evidence": "No telemetry port or dependency in any use case. No span wrapping at all."},
+        {"text": "fcm-push-port-exists: INotificationPushPort abstract class exists as an outbound port", "passed": true, "evidence": "src/domain/push-notification.port.ts exports 'abstract class PushNotificationPort'."},
+        {"text": "fcm-adapter-implements-port: FcmPushAdapter extends/implements the push port abstract class", "passed": true, "evidence": "fcm-push.adapter.ts: 'export class FcmPushAdapter extends PushNotificationPort'"},
+        {"text": "kafka-consumer-inbound: a Kafka consumer adapter exists under adapters/inbound/messaging/kafka/", "passed": false, "evidence": "Consumer at src/infrastructure/messaging/kafka/kafka.consumer.ts — in infrastructure layer, not adapters/inbound/."},
+        {"text": "kafka-consumer-separate-bootstrap: the consumer has its own bootstrap.ts separate from the Express HTTP bootstrap", "passed": false, "evidence": "No separate bootstrap for consumer. Started directly in main.ts alongside HTTP server."},
+        {"text": "kafka-topic-naming: Kafka topics follow notification.<past-tense-verb> convention", "passed": false, "evidence": "Use cases have no event bus — no outbound notification.* events published at all."},
+        {"text": "consumer-no-business-logic: the Kafka consumer adapter only parses messages and delegates to use cases", "passed": true, "evidence": "handleOrderCreated() validates required fields and delegates to use case. Minimal and correct."},
+        {"text": "redis-cache-ttl: N/A - Redis not in this service spec", "passed": true, "evidence": "Redis was not requested. No Redis adapter generated, which is correct."},
+        {"text": "config-zod-validated: infrastructure/config.ts uses a Zod schema to parse and validate environment variables", "passed": false, "evidence": "No config.ts with Zod. process.env accessed directly in main.ts, container.ts, prisma.client.ts."},
+        {"text": "js-extensions-on-imports: all local imports use the .js extension", "passed": false, "evidence": "Zero files use .js extensions. All imports use bare module paths."},
+        {"text": "test-doubles-extend-abstract-ports: doubles.ts uses 'extends' on the abstract port classes", "passed": false, "evidence": "InMemoryNotificationRepository uses 'implements NotificationRepository' (an interface). StubPushAdapter correctly extends abstract class."},
+        {"text": "e2e-uses-in-memory-adapters: _test/e2e/setup.ts wires the real controller with in-memory test doubles", "passed": true, "evidence": "E2E test uses in-memory repository and stub push adapter. No real DB/Kafka."},
+        {"text": "tdd-test-files-exist: test files exist for every layer", "passed": true, "evidence": "Domain test, use case tests, and e2e test all present."},
+        {"text": "no-process-env-outside-config: process.env is only accessed inside infrastructure/config.ts", "passed": false, "evidence": "process.env in main.ts (PORT, KAFKA_BROKERS, KAFKA_GROUP_ID, KAFKA_CLIENT_ID), container.ts, prisma.client.ts."},
+        {"text": "graceful-shutdown-allsettled: Express bootstrap uses Promise.allSettled to close multiple connections on shutdown", "passed": false, "evidence": "Shutdown runs kafkaConsumer.stop() and disconnectPrisma() sequentially with .catch(), not Promise.allSettled."}
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 1145.4, "stddev": 0.0, "min": 1145.4, "max": 1145.4},
+      "tokens": {"mean": 89123, "stddev": 0, "min": 89123, "max": 89123}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.45, "stddev": 0.0, "min": 0.45, "max": 0.45},
+      "time_seconds": {"mean": 425.7, "stddev": 0.0, "min": 425.7, "max": 425.7},
+      "tokens": {"mean": 44683, "stddev": 0, "min": 44683, "max": 44683}
+    },
+    "delta": {
+      "pass_rate": "+0.55",
+      "time_seconds": "+719.7",
+      "tokens": "+44440"
+    }
+  },
+  "notes": [
+    "domain-no-imports and private-constructor pass in both configurations — these are good baseline DDD practices even without the skill.",
+    "terminal-state-guard passes in both — the guard logic is natural enough that both agents got it right.",
+    "The skill adds ~12 minutes of execution time (1145s vs 426s) likely due to TDD cycle: writing tests before each layer takes more steps.",
+    "The 55-point pass rate gap (100% vs 45%) shows the skill strongly enforces hexagonal architecture specifics: port patterns, layering, telemetry, config isolation, .js extensions.",
+    "Biggest differentiators: telemetry.span wrapping (only with_skill), Zod config (only with_skill), .js extensions (only with_skill), kafka consumer in correct inbound layer (only with_skill), no-process-env discipline (only with_skill).",
+    "kafka-topic-naming is a clear differentiator: without_skill never added an event bus dependency to use cases, so no outbound events are published at all.",
+    "The redis-cache-ttl assertion was N/A for this eval (Redis not requested) — should be omitted or made conditional in future evals for this service type."
+  ]
+}

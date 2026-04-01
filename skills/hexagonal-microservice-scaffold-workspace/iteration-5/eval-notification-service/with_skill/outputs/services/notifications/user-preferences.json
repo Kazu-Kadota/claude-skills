@@ -1,0 +1,16 @@
+{
+  "domain": "notifications",
+  "entity": "Notification",
+  "tdd": true,
+  "inbound": ["kafka-consumer", "express-http"],
+  "database": {
+    "write": "postgres",
+    "read": "postgres",
+    "cqrs": false
+  },
+  "messaging": "kafka",
+  "telemetry": "otel",
+  "external": ["fcm"],
+  "monorepo": "standalone",
+  "terraform": false
+}

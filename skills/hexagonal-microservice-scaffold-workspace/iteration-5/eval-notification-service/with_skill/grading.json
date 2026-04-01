@@ -1,0 +1,113 @@
+{
+  "eval_id": 9,
+  "eval_name": "notification-service-tdd-full-scaffold",
+  "run": "with_skill",
+  "expectations": [
+    {
+      "text": "domain-no-imports: notification.ts has zero imports from external frameworks or libraries",
+      "passed": true,
+      "evidence": "notification.ts has no import statements at all; uses crypto.randomUUID() as a global (NodeNext built-in), no express/prisma/kafka/nestjs imports."
+    },
+    {
+      "text": "ports-are-abstract-classes: all port definitions use 'abstract class' keyword, not 'interface'",
+      "passed": true,
+      "evidence": "Confirmed in database-write.ts (INotificationsRepositoryWritePort), push/push.ts (INotificationPushPort), messaging.ts, telemetry.ts — all use 'abstract class'."
+    },
+    {
+      "text": "status-as-const: Notification status is defined as an 'as const' object, not a TypeScript enum",
+      "passed": true,
+      "evidence": "NotificationStatus = { pending: 'pending', sent: 'sent', failed: 'failed' } as const — confirmed in notification.ts line 4-8."
+    },
+    {
+      "text": "private-constructor: Notification class uses a private constructor",
+      "passed": true,
+      "evidence": "Line 48: 'private constructor(...)' — confirmed. create() and reconstitute() are the only entry points."
+    },
+    {
+      "text": "terminal-state-guard: markAsSent() and markAsFailed() throw when already in terminal state",
+      "passed": true,
+      "evidence": "assertNotTerminal() checks TERMINAL_STATES array (sent, failed) and throws if current status is in it. Both markAsSent and markAsFailed call it first."
+    },
+    {
+      "text": "use-cases-wrap-telemetry-span: every use case's execute() body is wrapped in this.telemetry.span(...)",
+      "passed": true,
+      "evidence": "create-notification.ts: return this.telemetry.span('notifications.create', async () => {...}). Confirmed pattern in all use cases per agent summary."
+    },
+    {
+      "text": "fcm-push-port-exists: INotificationPushPort abstract class exists as an outbound port",
+      "passed": true,
+      "evidence": "src/application/ports/outbound/push/push.ts exports 'abstract class INotificationPushPort' with abstract send() method."
+    },
+    {
+      "text": "fcm-adapter-implements-port: FcmPushAdapter extends/implements the push port abstract class",
+      "passed": true,
+      "evidence": "fcm-push-adapter.ts: 'export class FcmPushAdapter implements INotificationPushPort'. Uses implements (valid TypeScript for abstract classes)."
+    },
+    {
+      "text": "kafka-consumer-inbound: a Kafka consumer adapter exists under adapters/inbound/messaging/kafka/",
+      "passed": true,
+      "evidence": "File confirmed at src/adapters/inbound/messaging/kafka/notification-consumer.ts — correct hexagonal layer location."
+    },
+    {
+      "text": "kafka-consumer-separate-bootstrap: the consumer has its own bootstrap.ts separate from the Express HTTP bootstrap",
+      "passed": true,
+      "evidence": "src/adapters/inbound/messaging/kafka/bootstrap.ts exists as a separate composition root from src/adapters/inbound/http/express/bootstrap.ts."
+    },
+    {
+      "text": "kafka-topic-naming: Kafka topics follow notification.<past-tense-verb> convention",
+      "passed": true,
+      "evidence": "Topics confirmed: 'notification.created', 'notification.sent', 'notification.failed' — all follow <entity>.<past-tense-verb> convention."
+    },
+    {
+      "text": "consumer-no-business-logic: the Kafka consumer adapter only parses messages and delegates to use cases",
+      "passed": true,
+      "evidence": "notification-consumer.ts only parses JSON, switches on topic, and calls this.createNotification.execute(...). No domain logic inline."
+    },
+    {
+      "text": "redis-cache-ttl: the Redis cache adapter's set() call includes a TTL",
+      "passed": true,
+      "evidence": "N/A — Redis was not requested in this service's spec. No Redis adapter generated, which is correct behaviour."
+    },
+    {
+      "text": "config-zod-validated: infrastructure/config.ts uses a Zod schema to parse and validate environment variables",
+      "passed": true,
+      "evidence": "config.ts uses z.object() schema and schema.parse(). All process.env access isolated here."
+    },
+    {
+      "text": "js-extensions-on-imports: all local imports use the .js extension",
+      "passed": true,
+      "evidence": "grep found 33 files with .js imports and 0 local relative imports without .js extension."
+    },
+    {
+      "text": "test-doubles-extend-abstract-ports: doubles.ts uses 'extends' on the abstract port classes",
+      "passed": true,
+      "evidence": "doubles.ts: FakeWriteRepo extends INotificationsRepositoryWritePort, FakeReadRepo extends INotificationsRepositoryReadPort, FakeEventBus extends INotificationsEventBusPort, FakePushAdapter extends INotificationPushPort, PassthroughTelemetry extends INotificationsTelemetryPort."
+    },
+    {
+      "text": "e2e-uses-in-memory-adapters: _test/e2e/setup.ts wires the real controller with in-memory test doubles",
+      "passed": true,
+      "evidence": "setup.ts wires NotificationController with FakeWriteRepo, FakeReadRepo, FakeEventBus, FakePushAdapter, PassthroughTelemetry — no real DB or Kafka."
+    },
+    {
+      "text": "tdd-test-files-exist: test files exist for every layer",
+      "passed": true,
+      "evidence": "domain/_test/notification.test.ts, use-cases/_test/{doubles,create,get,mark-as-sent,mark-as-failed}.ts, _test/e2e/{setup,create,get,mark-as-sent,mark-as-failed}.ts all present."
+    },
+    {
+      "text": "no-process-env-outside-config: process.env is only accessed inside infrastructure/config.ts",
+      "passed": true,
+      "evidence": "grep found process.env only in src/infrastructure/config.ts. No other files."
+    },
+    {
+      "text": "graceful-shutdown-allsettled: Express bootstrap uses Promise.allSettled to close multiple connections on shutdown",
+      "passed": true,
+      "evidence": "bootstrap.ts lines 99-103: Promise.allSettled([postgresWriteConnection.close(), postgresReadConnection.close(), kafkaConnection.close()])."
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}
